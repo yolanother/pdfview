@@ -17,24 +17,38 @@
 # This makefile shows how to build a shared library and an activity that
 # bundles the shared library and calls it using JNI.
 
-TOP_LOCAL_PATH:= $(call my-dir)
-
-# Build activity
-
 LOCAL_PATH:= $(call my-dir)
 include $(CLEAR_VARS)
 
-LOCAL_MODULE := pdfview2
+src_files := $(call all-java-files-under,src) \
+             $(call all-java-files-under,overlay)
 
-LOCAL_SRC_FILES := $(call all-java-files-under, src/cx/hell/android/lib) \
-                   src/cx/hell/android/pdfview/Actions.java \
-                   src/cx/hell/android/pdfview/Options.java
-
-LOCAL_PACKAGE_NAME := pdfview
-
+LOCAL_MODULE := pdfview
 LOCAL_MODULE_TAGS := optional
-
+LOCAL_JAVA_LIBRARIES := core
 LOCAL_REQUIRED_MODULES := pdfview2
+LOCAL_SRC_FILES := $(src_files)
+
+
+#LOCAL_SRC_FILES := $(call all-java-files-under, src/cx/hell/android/lib) \
+#                   overlay/src/cx/hell/android/pdfview/Actions.java \
+#                   overlay/src/cx/hell/android/pdfview/Options.java
+#LOCAL_SRC_FILES := src/cx/hell/android/lib/pagesview/OnImageRenderedListener.java \
+                   src/cx/hell/android/lib/pagesview/RenderingException.java \
+                   src/cx/hell/android/lib/pagesview/N2EpdController.java \
+                   src/cx/hell/android/lib/pagesview/Tile.java \
+                   src/cx/hell/android/lib/pagesview/FindResult.java \
+                   src/cx/hell/android/lib/pagesview/PagesProvider.java \
+                   src/cx/hell/android/lib/view/TreeView.java \
+                   src/cx/hell/android/lib/pdf/PDF.java \
+                   overlay/src/cx/hell/android/pdfview/Actions.java \
+                   overlay/src/cx/hell/android/pdfview/Options.java
+
+#LOCAL_PACKAGE_NAME := pdfview
+
+#LOCAL_MODULE_TAGS := optional
+
+#LOCAL_REQUIRED_MODULES := pdfview2
 
 include $(BUILD_JAVA_LIBRARY)
 

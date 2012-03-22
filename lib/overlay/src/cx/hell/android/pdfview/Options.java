@@ -112,5 +112,21 @@ public class Options {
 		0.0f, 0.0f, 0.0f, 0.0f, 0f,
 		0.0f, 0.0f, 0.0f, -1.0f, 255.0f} 
 	};
-	
+
+
+    public static float[] getColorModeMatrix(int colorMode) {
+        return colorMatrices[colorMode];
+    }
+    
+    public static boolean isGray(int colorMode) {
+        return COLOR_MODE_GRAY <= colorMode;
+    }
+    
+    public static int getForeColor(int colorMode) {
+        return foreColors[colorMode];
+    }
+    
+    public static int getBackColor(int colorMode) {
+        return backColors[colorMode];
+    }	
 }
