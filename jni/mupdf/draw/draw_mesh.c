@@ -527,47 +527,47 @@ fz_paint_shade(fz_shade *shade, fz_matrix ctm, fz_pixmap *dest, fz_bbox bbox)
 	float color[FZ_MAX_COLORS];
 	int i, k;
 
-	ctm = fz_concat(shade->matrix, ctm);
+		ctm = fz_concat(shade->matrix, ctm);
 
-	if (shade->use_function)
-	{
-		for (i = 0; i < 256; i++)
+		if (shade->use_function)
 		{
+			for (i = 0; i < 256; i++)
+			{
 			fz_convert_color(shade->colorspace, shade->function[i], dest->colorspace, color);
-			for (k = 0; k < dest->colorspace->n; k++)
-				clut[i][k] = color[k] * 255;
-			clut[i][k] = shade->function[i][shade->colorspace->n] * 255;
-		}
+				for (k = 0; k < dest->colorspace->n; k++)
+					clut[i][k] = color[k] * 255;
+				clut[i][k] = shade->function[i][shade->colorspace->n] * 255;
+			}
 		conv = fz_new_pixmap_with_rect(dest->colorspace, bbox);
 		temp = fz_new_pixmap_with_rect(fz_device_gray, bbox);
 		fz_clear_pixmap(temp);
-	}
-	else
-	{
-		temp = dest;
-	}
-
-	switch (shade->type)
-	{
-	case FZ_LINEAR: fz_paint_linear(shade, ctm, temp, bbox); break;
-	case FZ_RADIAL: fz_paint_radial(shade, ctm, temp, bbox); break;
-	case FZ_MESH: fz_paint_mesh(shade, ctm, temp, bbox); break;
-	}
-
-	if (shade->use_function)
-	{
-		unsigned char *s = temp->samples;
-		unsigned char *d = conv->samples;
-		int len = temp->w * temp->h;
-		while (len--)
-		{
-			int v = *s++;
-			int a = fz_mul255(*s++, clut[v][conv->n - 1]);
-			for (k = 0; k < conv->n - 1; k++)
-				*d++ = fz_mul255(clut[v][k], a);
-			*d++ = a;
 		}
-		fz_paint_pixmap(dest, conv, 255);
+		else
+		{
+			temp = dest;
+		}
+
+		switch (shade->type)
+		{
+		case FZ_LINEAR: fz_paint_linear(shade, ctm, temp, bbox); break;
+		case FZ_RADIAL: fz_paint_radial(shade, ctm, temp, bbox); break;
+	case FZ_MESH: fz_paint_mesh(shade, ctm, temp, bbox); break;
+		}
+
+		if (shade->use_function)
+		{
+			unsigned char *s = temp->samples;
+			unsigned char *d = conv->samples;
+			int len = temp->w * temp->h;
+			while (len--)
+			{
+				int v = *s++;
+				int a = fz_mul255(*s++, clut[v][conv->n - 1]);
+				for (k = 0; k < conv->n - 1; k++)
+					*d++ = fz_mul255(clut[v][k], a);
+				*d++ = a;
+			}
+			fz_paint_pixmap(dest, conv, 255);
 		fz_drop_pixmap(conv);
 		fz_drop_pixmap(temp);
 	}

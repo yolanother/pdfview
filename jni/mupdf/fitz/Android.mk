@@ -13,6 +13,7 @@ LOCAL_C_INCLUDES := $(LOCAL_PATH)/../mupdf $(LOCAL_PATH)/../../jpeg \
 	$(LOCAL_PATH)/../../jbig2dec $(LOCAL_PATH)/../../openjpeg
 
 LOCAL_MODULE := fitz
+
 LOCAL_SRC_FILES := \
 	base_error.c \
 	base_object.c \
@@ -53,6 +54,7 @@ LOCAL_SRC_FILES := \
 	dev_text.c \
 	dev_bbox.c \
 	dev_null.c
+
 
 LOCAL_STATIC_LIBRARIES := libz
 LOCAL_LDLIBS := -lz

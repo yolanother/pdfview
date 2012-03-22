@@ -1,7 +1,6 @@
 #include "fitz.h"
 
 #define MAX_DEPTH 8
-
 enum { BUTT = 0, ROUND = 1, SQUARE = 2, TRIANGLE = 3, MITER = 0, BEVEL = 2 };
 
 static void
@@ -246,7 +245,6 @@ fz_add_line_join(struct sctx *s, fz_point a, fz_point b, fz_point c)
 	scale = linewidth / sqrtf(dx1 * dx1 + dy1 * dy1);
 	dlx1 = dy1 * scale;
 	dly1 = -dx1 * scale;
-
 	cross = dx1 * dy0 - dx0 * dy1;
 
 	dmx = (dlx0 + dlx1) * 0.5f;
@@ -263,8 +261,9 @@ fz_add_line_join(struct sctx *s, fz_point a, fz_point b, fz_point c)
 	if (linejoin == BEVEL)
 	{
 		fz_add_line(s, b.x - dlx0, b.y - dly0, b.x - dlx1, b.y - dly1);
-		fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
-	}
+
+			fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
+		}
 
 	if (linejoin == MITER)
 	{
@@ -280,23 +279,24 @@ fz_add_line_join(struct sctx *s, fz_point a, fz_point b, fz_point c)
 		}
 		else
 		{
-			fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
-			fz_add_line(s, b.x - dlx0, b.y - dly0, b.x - dmx, b.y - dmy);
-			fz_add_line(s, b.x - dmx, b.y - dmy, b.x - dlx1, b.y - dly1);
-		}
+		fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
+		fz_add_line(s, b.x - dlx0, b.y - dly0, b.x - dmx, b.y - dmy);
+		fz_add_line(s, b.x - dmx, b.y - dmy, b.x - dlx1, b.y - dly1);
+	}
 	}
 
 	if (linejoin == ROUND)
 	{
 		if (cross < 0)
 		{
-			fz_add_line(s, b.x - dlx0, b.y - dly0, b.x - dlx1, b.y - dly1);
+		fz_add_line(s, b.x - dlx0, b.y - dly0, b.x - dlx1, b.y - dly1);
 			fz_add_arc(s, b.x, b.y, dlx1, dly1, dlx0, dly0);
-		}
+	}
+
 		else
-		{
-			fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
-			fz_add_arc(s, b.x, b.y, -dlx0, -dly0, -dlx1, -dly1);
+	{
+		fz_add_line(s, b.x + dlx1, b.y + dly1, b.x + dlx0, b.y + dly0);
+		fz_add_arc(s, b.x, b.y, -dlx0, -dly0, -dlx1, -dly1);
 		}
 	}
 }

@@ -157,10 +157,14 @@ Java_cx_hell_android_lib_pdf_PDF_getPageCount(
 		jobject this) {
 	pdf_t *pdf = NULL;
     pdf = get_pdf_from_this(env, this);
+
+    __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "finshed get_pdf_from_this");
+
 	if (pdf == NULL) {
         __android_log_print(ANDROID_LOG_ERROR, PDFVIEW_LOG_TAG, "pdf is null");
         return -1;
     }
+    __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "pdf_count_pages");
 	return pdf_count_pages(pdf->xref);
 }
 
@@ -880,23 +884,35 @@ pdf_t* parse_pdf_file(const char *filename, int fileno, const char* password) {
     fz_stream *file;
 
     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(%s, %d)", filename, fileno);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
 
     pdf = create_pdf_t();
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
 
     if (filename) {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         fd = open(filename, O_BINARY | O_RDONLY, 0666);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         if (fd < 0) {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
             free(pdf);
             return NULL;
         }
     } else {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         pdf->fileno = dup(fileno);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         fd = pdf->fileno;
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     }
 
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     file = fz_open_fd(fd);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     error = pdf_open_xref_with_stream(&(pdf->xref), file, NULL);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     if (!pdf->xref) {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         __android_log_print(ANDROID_LOG_ERROR, PDFVIEW_LOG_TAG, "got NULL from pdf_openxref");
         /* __android_log_print(ANDROID_LOG_ERROR, PDFVIEW_LOG_TAG, "fz errors:\n%s", fz_errorbuf); */
         free(pdf);
@@ -910,12 +926,15 @@ pdf_t* parse_pdf_file(const char *filename, int fileno, const char* password) {
     }
     */
 
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     pdf->invalid_password = 0;
 
     if (pdf_needs_password(pdf->xref)) {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         int authenticated = 0;
         authenticated = pdf_authenticate_password(pdf->xref, (char*)password);
         if (!authenticated) {
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
             /* TODO: ask for password */
             __android_log_print(ANDROID_LOG_ERROR, PDFVIEW_LOG_TAG, "failed to authenticate");
             pdf->invalid_password = 1;
@@ -928,17 +947,22 @@ pdf_t* parse_pdf_file(const char *filename, int fileno, const char* password) {
     pdf->xref->info = fz_resolveindirect(fz_dictgets(pdf->xref->trailer, "Info"));
     if (pdf->xref->info) fz_keepobj(pdf->xref->info);
     */
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     pdf->outline = pdf_load_outline(pdf->xref);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
 
     error = pdf_load_page_tree(pdf->xref);
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     if (error) {
         __android_log_print(ANDROID_LOG_ERROR, PDFVIEW_LOG_TAG, "pdf_loadpagetree failed: %d", error);
         /* TODO: clean resources */
         return NULL;
     }
 
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
     {
         int c = 0;
+     __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "parse_pdf_file(line=%d)", __LINE__);
         c = pdf_count_pages(pdf->xref);
         __android_log_print(ANDROID_LOG_DEBUG, PDFVIEW_LOG_TAG, "page count: %d", c);
     }
