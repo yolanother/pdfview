@@ -10,10 +10,23 @@ import android.graphics.Bitmap;
  */
 public abstract class PagesProvider {
 
-	/**
-	 * Get page image tile for drawing.
-	 */
-	public abstract Bitmap getPageBitmap(Tile tile);
+    /**
+     * Get page image tile for drawing.
+     */
+    public abstract Bitmap getPageBitmap(Tile tile);
+
+
+    /**
+     * Really render bitmap. Takes time, should be done in background thread. Calls native code (through PDF object).
+     * @param page The page number to render
+     * @param zoom Adjusts the zoom level
+     * @param left 
+     * @param top
+     * @param rotation
+     * @return Returns the rendered page.
+     * @throws RenderingException
+     */
+    public abstract Bitmap renderBitmap(int page, int zoom, int left, int top, int rotation) throws RenderingException;
 	
 	/**
 	 * Get page count.

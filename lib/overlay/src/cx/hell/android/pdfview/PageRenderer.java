@@ -30,10 +30,17 @@ import cx.hell.android.pdfview.Actions;
 import cx.hell.android.pdfview.Options;
 
 public class PageRenderer implements OnImageRenderedListener {
-	/**
-	 * Logging tag.
-	 */
-	private static final String TAG = "cx.hell.android.pdfview";
+    /**
+     * Logging tag.
+     */
+    private static final String TAG = "cx.hell.android.pdfview";
+    
+    static {
+        Log.d(TAG, "Attempting to load library...");
+        System.loadLibrary("pdfview2");
+        
+        Log.d(TAG, "Log loaded successfully.");
+    }
 	
 	/* Experiments show that larger tiles are faster, but the gains do drop off,
 	 * and must be balanced against the size of memory chunks being requested.
@@ -190,6 +197,8 @@ public class PageRenderer implements OnImageRenderedListener {
 
 
 	public PageRenderer(int width, int height) {
+	    this.width = width;
+	    this.height = height;
 		this.actions = null;
 		this.lastControlsUseMillis = System.currentTimeMillis();
 		this.findResultsPaint = new Paint();
@@ -240,6 +249,7 @@ public class PageRenderer implements OnImageRenderedListener {
 	int prevLeft = -1;
 
 	public void onDraw(Canvas canvas) {
+        Log.d(TAG, "onDraw()");
 		if (this.nook2) {
 			N2EpdController.setGL16Mode();
 		}
@@ -352,6 +362,7 @@ public class PageRenderer implements OnImageRenderedListener {
 	 * Also collect info what's visible and push this info to page renderer.
 	 */
 	private void drawPages(Canvas canvas) {
+        Log.d(TAG, "drawPages()");
 		if (this.eink) {
 			canvas.drawColor(Color.WHITE);
 		}
@@ -368,6 +379,7 @@ public class PageRenderer implements OnImageRenderedListener {
 		float currentMarginY = this.getCurrentMarginY();
 		float renderAhead = this.pagesProvider.getRenderAhead();
 
+        Log.d(TAG, "checking pages provider: " + this.pagesProvider);
 		if (this.pagesProvider != null) {
                         if (this.zoomLevel < 5)
                             this.zoomLevel = 5;
@@ -398,6 +410,8 @@ public class PageRenderer implements OnImageRenderedListener {
 			pagey0 = 0;
 			int[] tileSizes = new int[2];
 
+            Log.d(TAG, "Looping through pages with count: " + pageCount);
+            
 			for(int i = 0; i < pageCount; ++i) {
 				// is page i visible?
 
@@ -409,12 +423,14 @@ public class PageRenderer implements OnImageRenderedListener {
 				pagey0 = currpageoff;
 				pagey1 = (int)(currpageoff + pageHeight);
 				
+                Log.d(TAG, "Checking rectsintersect:");
 				if (rectsintersect(
 							(int)pagex0, (int)pagey0, (int)pagex1, (int)pagey1, // page rect in doc
 							viewx0, viewy0, viewx0 + this.width, 
 							viewy0 + (int)(renderAhead*this.height) // viewport rect in doc, or close enough to it 
 						))
 				{
+                    Log.d(TAG, "rects intersect.");
 					if (this.currentPage == -1)  {
 						// remember the currently displayed page
 						this.currentPage = i;
@@ -422,23 +438,24 @@ public class PageRenderer implements OnImageRenderedListener {
 					
 					x = (int)pagex0 - viewx0;
 					y = (int)pagey0 - viewy0;
-					
+					Log.d(TAG, "getting good tile sizes.");
 					getGoodTileSizes(tileSizes, pageWidth, pageHeight);
 					
 					for(int tileix = 0; tileix < (pageWidth + tileSizes[0]-1) / tileSizes[0]; ++tileix)
 						for(int tileiy = 0; tileiy < (pageHeight + tileSizes[1]-1) / tileSizes[1]; ++tileiy) {
-							
+							Log.d(TAG, "Working on tile: " + tileix + "," + tileiy);
 							dst.left = (int)(x + tileix*tileSizes[0]);
 							dst.top = (int)(y + tileiy*tileSizes[1]);
 							dst.right = dst.left + tileSizes[0];
 							dst.bottom = dst.top + tileSizes[1];	
 						
 							if (dst.intersects(0, 0, this.width, (int)(renderAhead*this.height))) {
-
+                                Log.d(TAG, "dst.intersects(renderAhead)");
 								Tile tile = new Tile(i, (int)(this.zoomLevel * scaling0), 
 										tileix*tileSizes[0], tileiy*tileSizes[1], this.rotation,
 										tileSizes[0], tileSizes[1]);
 								if (dst.intersects(0, 0, this.width, this.height)) {
+                                    Log.d(TAG, "dstIntersects, getting pagebitmap");
 									Bitmap b = this.pagesProvider.getPageBitmap(tile);
 									if (b != null) {
 										//Log.d(TAG, "  have bitmap: " + b + ", size: " + b.getWidth() + " x " + b.getHeight());
@@ -456,7 +473,7 @@ public class PageRenderer implements OnImageRenderedListener {
 											src.bottom = (int)(b.getHeight() * (float)((y+pageHeight)-dst.top) / (float)(dst.bottom - dst.top));
 											dst.bottom = (int)(y + pageHeight);
 										}
-										
+										Log.d(TAG, "Drawing bitmap with drawBitmap ~ln466");
 										drawBitmap(canvas, b, src, dst);
 										
 									}
@@ -1144,6 +1161,7 @@ public class PageRenderer implements OnImageRenderedListener {
 	}
 	
 	public void invalidate() {
+        Log.d(TAG, "invalidate(" + mInvalidate + ")");
 		if(null != mInvalidate) {
 			mInvalidate.onInvalidate();
 		}

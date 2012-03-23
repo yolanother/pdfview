@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileDescriptor;
 import java.util.List;
 
+import android.util.Log;
+
 import cx.hell.android.lib.pagesview.FindResult;
 
 // #ifdef pro
@@ -22,7 +24,10 @@ public class PDF {
 	private final static String TAG = "cx.hell.android.pdfview";
 	
 	static {
+	    Log.d(TAG, "Attempting to load library...");
         System.loadLibrary("pdfview2");
+        
+        Log.d(TAG, "Log loaded successfully.");
 	}
 	
 	/**
@@ -197,7 +202,7 @@ public class PDF {
 	 * @param fileName pdf file name
 	 * @return error code
 	 */
-	synchronized private native int parseFile(String fileName, int box, String password);
+	synchronized private native void parseFile(String fileName, int box, String password);
 	
 	/**
 	 * Parse PDF file.
@@ -217,6 +222,7 @@ public class PDF {
 	 * Construct PDF structures from file sitting on local filesystem.
 	 */
 	public PDF(File file, int box) {
+	    Log.d(TAG, "Parsing file...");
 		this.parseFile(file.getAbsolutePath(), box, "");
 	}
 	
@@ -225,6 +231,7 @@ public class PDF {
 	 * @param file opened file descriptor
 	 */
 	public PDF(FileDescriptor file, int box) {
+	    Log.d(TAG, "Parsing file...");
 		this.parseFileDescriptor(file, box, "");
 	}
 	

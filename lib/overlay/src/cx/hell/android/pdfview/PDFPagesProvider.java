@@ -449,6 +449,39 @@ public class PDFPagesProvider extends PagesProvider {
     }
     
     /**
+     *  Really render bitmap. Takes time, should be done in background thread. Calls native code (through PDF object).
+     * @param page The page number to render
+     * @return Returns the rendered page.
+     * @throws RenderingException
+     */
+    public Bitmap renderBitmap(int page, int zoom, int left, int top, int rotation) throws RenderingException {
+        PDF.Size size = new PDF.Size();
+        this.pdf.getPageSize(page, size);
+        int[] pagebytes = null;
+        
+        long t1 =SystemClock.currentThreadTimeMillis();
+        pagebytes = pdf.renderPage(page, zoom, left, top, 
+                rotation, gray, omitImages, size); /* native */
+        Log.v(TAG, "Time:"+(SystemClock.currentThreadTimeMillis()-t1));
+        if (pagebytes == null) throw new RenderingException("Couldn't render page " + page);
+        
+        /* create a bitmap from the 32-bit color array */           
+
+        if (gray) {
+            Bitmap b = Bitmap.createBitmap(pagebytes, size.width, size.height, 
+                    Bitmap.Config.ARGB_8888);
+            Bitmap b2 = b.copy(Bitmap.Config.ALPHA_8, false);
+            b.recycle();
+            return b2;
+        }
+        else {
+            Bitmap b = Bitmap.createBitmap(pagebytes, size.width, size.height, 
+                    Bitmap.Config.RGB_565);
+            return b;
+        }
+    }
+    
+    /**
      * Called by worker.
      */
     private void publishBitmaps(Map<Tile,Bitmap> renderedTiles) {
